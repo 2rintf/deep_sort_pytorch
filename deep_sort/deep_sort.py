@@ -43,7 +43,9 @@ class DeepSort(object):
         # output bbox identities
         outputs = []
         for track in self.tracker.tracks:
+            # time_since_update : int. --> Total number of frames since last measurement update.
             if not track.is_confirmed() or track.time_since_update > 1:
+            # if not track.is_confirmed():
                 continue
             box = track.to_tlwh()
             x1,y1,x2,y2 = self._tlwh_to_xyxy(box)
