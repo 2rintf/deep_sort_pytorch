@@ -74,14 +74,15 @@ class VideoTracker(object):
             bb_width = x2-x1
             bb_height = y2-y1
             bb_id = id[i]
-            bb_conf = conf[i]
+            # To-Do: 把track所对应的conf从tracker.py中拿出来
+            # bb_conf = conf[i]
             fs.write(str(id_frame)+","+
                      str(bb_id)+","+
                      str(x1)+","+
                      str(y1)+","+
                      str(bb_width)+","+
                      str(bb_height)+","+
-                     str(bb_conf)+","+str(type)+'\n')
+                     str(1)+","+str(type)+'\n')
         fs.close()
 
     def run(self):
@@ -168,5 +169,5 @@ if __name__ == "__main__":
     resultFile = "./Results/Track1.txt"
 
 
-    with VideoTracker(cfg,1,1,imgSeqPath) as vdo_trk:
+    with VideoTracker(cfg,1,0,imgSeqPath) as vdo_trk:
         vdo_trk.run()
