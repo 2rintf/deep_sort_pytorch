@@ -62,8 +62,31 @@ class VideoTracker(object):
         if exc_type:
             print(exc_type, exc_value, exc_traceback)
 
+    def writeResults(self,id_frame,bbox_xyxy,id,conf,type=0):
+        fs = open(resultFile,'a+')
+        num = len(bbox_xyxy)
+
+        for i in range(num):
+            x1 = bbox_xyxy[i,0]
+            y1 = bbox_xyxy[i,1]
+            x2 = bbox_xyxy[i,2]
+            y2 = bbox_xyxy[i,3]
+            bb_width = x2-x1
+            bb_height = y2-y1
+            bb_id = id[i]
+            bb_conf = conf[i]
+            fs.write(str(id_frame)+","+
+                     str(bb_id)+","+
+                     str(x1)+","+
+                     str(y1)+","+
+                     str(bb_width)+","+
+                     str(bb_height)+","+
+                     str(bb_conf)+","+str(type)+'\n')
+        fs.close()
+
     def run(self):
         idx_frame = 0
+        pre_id = []
         # fs = open(resultFile,'w+')
         while idx_frame <= self.frameCount-1:
             idx_frame += 1
@@ -84,8 +107,8 @@ class VideoTracker(object):
                 bbox_xywh[:, 3:] *= 1.2  # bbox dilation just in case bbox too small
                 cls_conf = cls_conf[mask]
 
-                print(bbox_xywh)
-                print(cls_conf)
+                # print(len(bbox_xywh))
+                print(len(cls_conf))
 
                 # do tracking
                 outputs = self.deepsort.update(bbox_xywh, cls_conf, im)
@@ -96,8 +119,19 @@ class VideoTracker(object):
                     bbox_xyxy = outputs[:, :4]
                     identities = outputs[:, -1]
                     ori_im = draw_boxes(ori_im, bbox_xyxy, identities)
+                    print(len(identities))
 
-
+                    '''
+                    To-Do: write result.
+                    '''
+                    # if pre_id is None:
+                    #     id_mask=[]
+                    # else:
+                    #
+                    #     id_mask = pre_id==identities
+                    # print(len(id_mask))
+                    self.writeResults(idx_frame,bbox_xyxy,identities,cls_conf)
+                    pre_id = identities
 
             end = time.time()
             print("time: {:.03f}s, fps: {:.03f}".format(end - start, 1 / (end - start)))

@@ -68,14 +68,27 @@ class Tracker:
         matches, unmatched_tracks, unmatched_detections = \
             self._match(detections)
 
+        # debug
+        test_conf=[]
         # Update track set.
         for track_idx, detection_idx in matches:
             self.tracks[track_idx].update(
                 self.kf, detections[detection_idx])
+#####################debug##########################
+            test_conf.append(detections[detection_idx].confidence)
+        print("matched:"+str(len(matches)))
+#####################debug##########################
         for track_idx in unmatched_tracks:
             self.tracks[track_idx].mark_missed()
+        print("missed:"+str(len(unmatched_tracks)))
         for detection_idx in unmatched_detections:
             self._initiate_track(detections[detection_idx])
+            # debug
+            test_conf.append(detections[detection_idx].confidence)
+        # print("debug")
+        # print(len(test_conf))
+        print("new_track:"+str(len(unmatched_detections)))
+
         self.tracks = [t for t in self.tracks if not t.is_deleted()]
 
         # Update distance metric.
